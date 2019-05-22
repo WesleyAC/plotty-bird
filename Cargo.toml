@@ -1,0 +1,9 @@
+[package]
+name = "flappy-plotter"
+version = "0.1.0"
+authors = ["Wesley Aptekar-Cassels <me@wesleyac.com>"]
+edition = "2018"
+
+[dependencies]
+serialport = "3.2.0"
+rand = "0.6.5"
