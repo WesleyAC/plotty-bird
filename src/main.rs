@@ -100,31 +100,26 @@ fn check_collision(x: i32, y: i32, board: &Vec<PipePair>) -> bool {
 
 fn send_commands(cmds: &Vec<Vec<u8>>, port: &mut Box<dyn SerialPort>) {
     let mut next_cmd = vec![];
+    let mut chunks: Vec<Vec<u8>> = vec![];
     for cmd in cmds.iter() {
         if next_cmd.len() + cmd.len() < 57 {
             next_cmd.append(&mut cmd.clone());
         } else {
-            port.write(&next_cmd);
-            port.write(b"OA;");
-            let mut c = 0;
-            while c != 13 {
-                let mut v = vec![0];
-                port.read(v.as_mut_slice());
-                c = v[0];
-            }
-            port.clear(ClearBuffer::All);
+            chunks.push(next_cmd);
             next_cmd = cmd.to_vec();
         }
     }
-    port.write(&next_cmd);
-    port.write(b"OA;");
-    let mut c = 0;
-    while c != 13 {
-        let mut v = vec![0];
-        port.read(v.as_mut_slice());
-        c = v[0];
+    chunks.push(next_cmd);
+    for chunk in chunks {
+        port.write(&chunk);
+        port.write(b"OA;");
+        let mut c = 0;
+        while c != 13 {
+            let mut v = vec![0];
+            port.read(v.as_mut_slice());
+            c = v[0];
+        }
     }
-    port.clear(ClearBuffer::All);
 }
 
 fn main() -> Result<(),Error> {
